@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* Short viewports (laptops with browser chrome, phones in landscape). */
+@custom-variant short (@media (max-height: 720px));
+
+:root {
+  --paper: #f4f1e8;
+  --ink: #111111;
+  --lime: #d7ff35;
+  --cobalt: #304ffe;
+  --signal: #ff5a1f;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-lime: var(--lime);
+  --color-cobalt: var(--cobalt);
+  --color-signal: var(--signal);
+}
+
+html {
+  background: var(--paper);
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+/* The custom cursor replaces the native one on fine pointers. */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
+/* Custom primitives live in the components layer so Tailwind utilities
+   (position, tracking, leading...) can still override them per element. */
+@layer components {
+/* ---------- Type primitives ---------- */
+/* Technical metadata set in the margins. */
+.meta {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Display type: heavy, tight, and shaped with the width axis. */
+.display {
+  font-family: var(--font-archivo), ui-sans-serif, sans-serif;
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+  /* Condensed widths shrink the space glyph; keep words legibly apart. */
+  word-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.wdth-condensed {
+  font-variation-settings: "wdth" 62;
+}
+.wdth-normal {
+  font-variation-settings: "wdth" 100;
+}
+.wdth-expanded {
+  font-variation-settings: "wdth" 125;
+}
+
+/* Hollow type for contrast against solid lines. */
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: max(1.5px, 0.018em) var(--ink);
+}
+.outline-text-paper {
+  color: transparent;
+  -webkit-text-stroke: max(1.5px, 0.018em) var(--paper);
+}
+
+/* ---------- Hard-shadow objects ----------
+   Everything that can be touched sits on the page with a solid offset shadow.
+   Hover lifts it toward you; pressing pushes it flat into the page. */
+.slab {
+  --lift: 0px;
+  --depth: 8px;
+  position: relative;
+  border: 2px solid var(--ink);
+  box-shadow: calc(var(--depth) + var(--lift)) calc(var(--depth) + var(--lift)) 0 var(--ink);
+  transform: translate(calc(var(--lift) * -1), calc(var(--lift) * -1));
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out),
+    background-color 0.35s var(--ease-out),
+    color 0.35s var(--ease-out);
+}
+.slab-interactive:hover {
+  --lift: 4px;
+}
+.slab-interactive:active {
+  --lift: calc(var(--depth) * -1);
+  transition-duration: 0.08s;
+}
+
+.slab-sm {
+  --depth: 4px;
+}
+
+.lens-frame {
+  transition: --lens 0.45s var(--ease-out);
+}
+}
+
+/* Poster lens: a registered property so its radius can tween. */
+@property --lens {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* ---------- Scrollbar ---------- */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--paper);
+    border-left: 2px solid var(--ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slab {
+    transition: none;
+  }
+}
